@@ -5,7 +5,13 @@ const app = express();
 
 module.exports = function (app, myDataBase) {
   app.route('/').get((req, res) => {
-    res.render('pug', { title: 'Connected to Database', message: 'Please login', showLogin: true, showRegistration: true });
+    res.render('pug', { 
+    	title: 'Connected to Database', 
+    	message: 'Please login', 
+    	showLogin: true, 
+    	showRegistration: true, 
+    	showSocialAuth: true 
+    });
   });
 
   app.route('/profile').get(ensureAuthenticated, (req, res) => {
@@ -23,6 +29,12 @@ module.exports = function (app, myDataBase) {
     passport.authenticate('local', { failureRedirect: '/' }),
     (req, res) => {
       res.redirect('/profile')
+  })
+
+  app.route('/auth/github').get(passport.authenticate('github'))
+
+  app.route('/auth/github/callback').get(passport.authenticate('github', { failureRedirect: '/' }), (req, res) => {
+  	res.redirect('/profile')
   })
 
   app.route('/register').post((req, res, next) => {
