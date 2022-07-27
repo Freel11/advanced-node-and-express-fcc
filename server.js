@@ -46,6 +46,10 @@ myDB(async client => {
     res.render('pug', { title: 'Connected to Database', message: 'Please login', showLogin: true });
   });
 
+  app.route('/profile').get(ensureAuthenticated, (req, res) => {
+    res.render('/profile')
+  })
+
   app.post('/login',
     passport.authenticate('local', { failureRedirect: '/' }),
     (req, res) => {
@@ -61,6 +65,11 @@ myDB(async client => {
       done(null, doc)
     })
   })
+
+  function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) { return next() }
+    res.redirect('/')
+  }
 
 }).catch(e => {
   app.route('/').get((req, res) => {
