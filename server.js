@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
-  RESAVE: true,
+  resave: true,
   key: 'express.sid',
   store: store,
   saveUninitialized: true,
