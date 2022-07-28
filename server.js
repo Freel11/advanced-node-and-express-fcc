@@ -24,6 +24,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: true,
+  key: 'express.sid',
+  store: store,
   saveUninitialized: true,
   cookie: { secure: false }
 }))
@@ -40,12 +42,22 @@ myDB(async client => {
   routes(app, myDataBase)
   auth(app, myDataBase)
 
-  let currentUsers = 0
+  io.use(
+    passportSocketIo.authorize({
+      cookieParser: cookieParser,
+      key: 'express.sid',
+      secret: process.env.SESSION_SECRET,
+      store: store,
+      success: onAuthorizeSuccess,
+      fail: onAuthorizeFail
+    })
+  )
 
+  let currentUsers = 0
   io.on('connection', socket => {
     ++currentUsers
     io.emit('user count', currentUsers)
-    console.log(`user has connected`)
+    console.log(`user ${socket.request.user.username} connected`)
 
     socket.on('disconnect', () => {
       --currentUsers
@@ -59,6 +71,19 @@ myDB(async client => {
     res.render('pug', { title: e, message: 'Unable to login'})
   })
 })
+
+function onAuthorizeSuccess(data, accept) {
+  console.log('Successful connection to socket.io')
+  accept(null, true)
+}
+
+function onAuthorizeFail(data, message, error, accept) {
+  if (error) {
+    throw new Error(message)
+  }
+  console.log('failed connection to socket.io:', message)
+  accept(null, false)
+}
 
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, () => {
