@@ -24,8 +24,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: true,
-  key: 'express.sid',
-  store: store,
   saveUninitialized: true,
   cookie: { secure: false }
 }))
@@ -41,17 +39,6 @@ myDB(async client => {
 
   routes(app, myDataBase)
   auth(app, myDataBase)
-
-  io.use(
-    passportSocketIo.authorize({
-      cookieParser: cookieParser,
-      key: 'express.sid',
-      secret: process.env.SESSION_SECRET,
-      store: store,
-      success: onAuthorizeSuccess,
-      fail: onAuthorizeFail
-    })
-  )
 
   let currentUsers = 0
   io.on('connection', socket => {
