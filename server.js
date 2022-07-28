@@ -57,7 +57,7 @@ myDB(async client => {
   io.on('connection', socket => {
     ++currentUsers
     io.emit('user count', currentUsers)
-    console.log(`user ${socket.request.user.username} connected`)
+    console.log(`user connected`)
 
     socket.on('disconnect', () => {
       --currentUsers
@@ -78,6 +78,9 @@ function onAuthorizeSuccess(data, accept) {
 }
 
 function onAuthorizeFail(data, message, error, accept) {
+  if (error) {
+    throw new Error(message)
+  }
   console.log('failed connection to socket.io:', message)
   accept(null, false)
 }
