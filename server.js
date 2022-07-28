@@ -55,12 +55,20 @@ myDB(async client => {
 
   io.on('connection', socket => {
     ++currentUsers
-    io.emit('user count', currentUsers)
+    io.emit('user', {
+      name: socket.request.user.username,
+      currentUsers,
+      connected: true
+    })
     console.log(`user ${socket.request.user.username} has connected`)
 
     socket.on('disconnect', () => {
       --currentUsers
-      io.emit('user count', currentUsers)
+      io.emit('user', {
+        name: socket.request.user.username,
+        currentUsers,
+        connected: false
+      })
       console.log(`user ${socket.request.user.username} has disconnected`)
     })
   })
