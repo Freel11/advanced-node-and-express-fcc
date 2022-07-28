@@ -28,7 +28,6 @@ app.use(passport.session())
 
 app.set('view engine', 'pug')
 
-
 myDB(async client => {
   const myDataBase = await client.db('database').collection('users')
 
@@ -53,19 +52,6 @@ myDB(async client => {
     res.render('pug', { title: e, message: 'Unable to login'})
   })
 })
-
-function onAuthorizeSuccess(data, accept) {
-  console.log('Successful connection to socket.io')
-  accept(null, true)
-}
-
-function onAuthorizeFail(data, message, error, accept) {
-  if (error) {
-    throw new Error(message)
-  }
-  console.log('failed connection to socket.io:', message)
-  accept(null, false)
-}
 
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, () => {
