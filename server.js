@@ -40,6 +40,11 @@ myDB(async client => {
   io.on('connection', socket => {
     ++currentUsers
     io.emit('user count', currentUsers)
+
+    io.on('disconnect', () => {
+      --currentUsers
+      io.emit('user count', currentUsers)
+    })
   })
 
 }).catch(e => {
